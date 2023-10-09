@@ -47,9 +47,9 @@ class Graf
 
     public Graf(Graf garf)
     {
-        Adjacency = this.Adjacency;
-        orient = this.orient;
-        weight = this.weight;
+        Adjacency = garf.Adjacency;
+        orient = garf.orient;
+        weight = garf.weight;
     }
 
     public void Add_Vertex(string ver_name)
