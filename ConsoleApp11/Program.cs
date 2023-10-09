@@ -14,13 +14,13 @@ class Graf
     {
         try
         {
-            // Открываем файл для чтения
+            
             using (StreamReader reader = new StreamReader(filePath))
             {
                 string line;
                 while ((line = reader.ReadLine()) != null)
                 {
-                    // Разбиваем строку на вершину и её соседей
+                    
                     string[] parts = line.Split(':');
                     if (parts.Length != 2)
                     {
@@ -30,14 +30,14 @@ class Graf
                     string vertex = parts[0].Trim();
                     string[] neighbors = parts[1].Split(',').Select(n => n.Trim()).ToArray();
 
-                    // Добавляем вершину и её соседей в словарь
+                    
                     Adjacency[vertex] = neighbors.ToList();
                 }
             }
         }
         catch (Exception ex)
         {
-            // Обработка ошибок, например, вывод сообщения об ошибке
+            
             Console.WriteLine($"Произошла ошибка: {ex.Message}");
         }
     }
