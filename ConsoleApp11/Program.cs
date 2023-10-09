@@ -47,7 +47,8 @@ class Graf
 
     public Graf(Graf garf)
     {
-        Adjacency = garf.Adjacency;
+        Adjacency = new Dictionary<string, List<string>>(garf.Adjacency);
+        foreach (var item in Adjacency.Keys) Adjacency[item] = new List<string>(garf.Adjacency[item]);
         orient = garf.orient;
         weight = garf.weight;
     }
