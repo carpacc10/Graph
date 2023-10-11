@@ -1,8 +1,6 @@
 using System.ComponentModel;
-//Add_edge(mass[i].Split(" : ")[0], a.Split(" ")[j].Split(",")[0], Convert.ToDouble(a.Split(" ")[j].Split(",")[1]));
 Graf graf = new Graf();
 graf.printq();
-
 
 class Graf
 {
@@ -15,21 +13,31 @@ class Graf
         Adjacency = new Dictionary<string, List<(string, double)>>();
         orient = new bool();
         weight = new bool();
+
     }
 
     public Graf(string filePath)
     {
         string[] mass = File.ReadAllLines(filePath);
-        for (int i = 0; i < mass.Length; i++)
+        weight = Convert.ToBoolean(mass[0].Split(" : ")[1]);
+        orient = Convert.ToBoolean(mass[1].Split(" : ")[1]);
+        for (int i = 2; i < mass.Length; i++)
         {
             Add_Vertex(mass[i].Split(" : ")[0]);
         }
-        for (int i = 0; i < mass.Length; i++)
+        for (int i = 2; i < mass.Length; i++)
         {
             string a = mass[i].Split(" : ")[1];
             for (int j = 0; j < a.Split(" ").Count(); j++)
             {
-                Adjacency[mass[i].Split(" : ")[0]].Add((a.Split(" ")[j].Split(",")[0], Convert.ToDouble(a.Split(" ")[j].Split(",")[1])));
+                if (weight)
+                {
+                    Adjacency[mass[i].Split(" : ")[0]].Add((a.Split(" ")[j].Split(",")[0], Convert.ToDouble(a.Split(" ")[j].Split(",")[1])));
+                }
+                else
+                {
+                    Adjacency[mass[i].Split(" : ")[0]].Add((a.Split(" ")[j].Split(",")[0], double.NaN));
+                }
             }
         }
     }
@@ -40,6 +48,7 @@ class Graf
         foreach (var item in Adjacency.Keys) Adjacency[item] = new List<(string, double)>(garf.Adjacency[item]);
         orient = garf.orient;
         weight = garf.weight;
+
     }
 
     public void Check_wgNor()
@@ -80,14 +89,15 @@ class Graf
 
         if (ver_name1 == ver_name2 || orient)
         {
+
             Adjacency[ver_name1].Add((ver_name1, weights));
+
         }
         else
         {
             Adjacency[ver_name1].Add((ver_name2, weights));
             Adjacency[ver_name2].Add((ver_name1, weights));
         }
-
     }
     public void Remove_Vertex(string ver_name)
     {
@@ -124,28 +134,60 @@ class Graf
     {
         using (StreamWriter wr = new StreamWriter(path))
         {
-            foreach (var v in Adjacency)
+            wr.Write("weight : " + weight + "\n" + "orient : " + orient + "\n");
+            if (weight)
             {
-                wr.Write(v.Key.ToString() + " :");
-                foreach (var v2 in v.Value) wr.Write(" " + (v2.Item1) + "," + (v2.Item2).ToString());
-                wr.WriteLine();
+
+                foreach (var v in Adjacency)
+                {
+                    wr.Write(v.Key.ToString() + " :");
+                    foreach (var v2 in v.Value) wr.Write(" " + (v2.Item1) + "," + (v2.Item2).ToString());
+                    wr.WriteLine();
+                }
+            }
+            else
+            {
+                foreach (var v in Adjacency)
+                {
+                    wr.Write(v.Key.ToString() + " :");
+                    foreach (var v2 in v.Value) wr.Write(" " + (v2.Item1));
+                    wr.WriteLine();
+                }
+
             }
         }
     }
 
-
     public void Adjacency_List_print()
     {
-        foreach (var v in Adjacency)
+        if (weight)
         {
-            Console.Write(v.Key.ToString() + " :");
-            foreach (var v2 in v.Value) Console.Write(" " + (v2.Item1) + "," + (v2.Item2).ToString());
-            Console.WriteLine();
+            foreach (var v in Adjacency)
+            {
+                Console.Write(v.Key.ToString() + " :");
+                foreach (var v2 in v.Value) Console.Write(" " + (v2.Item1) + "," + (v2.Item2).ToString());
+                Console.WriteLine();
+            }
         }
+        else
+        {
+            foreach (var v in Adjacency)
+            {
+                Console.Write(v.Key.ToString() + " :");
+                foreach (var v2 in v.Value) Console.Write(" " + (v2.Item1));
+                Console.WriteLine();
+            }
+        }
+
     }
 
     public void printq()
     {
+        Console.WriteLine("Если график имеет вес нажмите 1, иначе 0");
+        int key = int.Parse(Console.ReadLine());
+        if (key == 1) weight = true;
+        else weight = false;
+
         while (true)
         {
             Console.WriteLine("\nMenu:");
@@ -176,12 +218,24 @@ class Graf
                     Console.WriteLine("Введите исходную вершину и конечную вершину:");
                     vertex = Console.ReadLine();
                     vertex2 = Console.ReadLine();
-                    wg = int.Parse(Console.ReadLine());
-                    if (!Check_Edge(vertex, vertex2))
+                    if (weight)
                     {
-                        Add_edge(vertex, vertex2);
+                        wg = int.Parse(Console.ReadLine());
+                        if (!Check_Edge(vertex, vertex2))
+                        {
+                            Add_edge(vertex, vertex2, wg);
+                        }
+                        else Console.WriteLine("Такое ребро невозможно построить");
                     }
-                    else Console.WriteLine("Такое ребро невозможно построить");
+                    else
+                    {
+                        if (!Check_Edge(vertex, vertex2))
+                        {
+                            Add_edge(vertex, vertex2);
+                        }
+                        else Console.WriteLine("Такое ребро невозможно построить");
+                    }
+
                     break;
                 case 3:
                     Console.WriteLine("Введите вершину, которую нужно удалить:");
@@ -224,4 +278,3 @@ class Graf
         }
     }
 }
-
